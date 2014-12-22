@@ -12,7 +12,7 @@ function start() {
 
 	initShaders();
     initTexture(function(){
-
+        // Wait for image to load before init buffers
     	initBuffers();
     });
 
