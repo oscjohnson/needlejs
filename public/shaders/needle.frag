@@ -8,16 +8,33 @@ varying vec2 vTexCoord;
 /*
 	Steg 1:
 	X Kvantisera bilden.
+	X Implement cross stitching
+	Anti aliasing
+	parameters 
+		* Quantization only
+		* Cross stitching off
+		* width
+		* height 
 	Gör en loop för att rendera om bilden
 	Skicka upp parametrar till shadern
 
  */
 
+float filterstep(float edge, float x, float w) {
+	if( (x+w/2.0) < edge) {
+		return 0.0;
+	}
+	else if( (x - w/2.0) > edge) {
+		return 1.0;
+	}
+	
+	return ( (x+w/2.0) - edge ) / w;
+}
+
 float length_squared(vec2 v, vec2 w) {
 	return float ((v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y));
 
 }
-
 
 float ptlined(vec2 v, vec2 w, vec2 p) {
 
@@ -42,7 +59,7 @@ float ptlined(vec2 v, vec2 w, vec2 p) {
 
 
 void main() {
-	float thread = 0.4; // Trådens bredd i förhållande till stygnet
+	float thread = 0.2; // Trådens bredd i förhållande till stygnet
 	float gap = 0.02; // Marginal för en liten lucka mellan stygnen
 	float nh = 64.0; // Antal pixels (stygn) på höjden i texturen
 	float nw = 64.0; // Antal pixels (stygn) på bredden i texturen
@@ -74,11 +91,14 @@ void main() {
 	float dmin = min(d1, d2);
 	
 	float d = dmin;
-	float inside = 0.0;//filterstep(thread/2, d);
 
+
+	// Anti-aliasing, how?
+	float inside = d;
+	inside = filterstep(thread/2.0, d, 1.0/64.0);
 	
 	
 
-	gl_FragColor = mix(C, Cbg, d);
+	gl_FragColor = mix(C, Cbg, inside);
 
 }
