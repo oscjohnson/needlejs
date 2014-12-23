@@ -3,7 +3,13 @@ var shaderProgram;
 var image,
 rectVertexPositionBuffer,
 texCoordPositionBuffer,
-texture;
+texture,
+config = {};
+config.thread = 0.3,
+config.gap = 0.02;
+config.nw = 64.0;
+config.nh = 64.0
+config.shade = true;
 
 function start() {
 	var canvas = document.getElementById("canvas");
@@ -14,11 +20,27 @@ function start() {
     initTexture(function(){
         // Wait for image to load before init buffers
     	initBuffers();
+        setInterval(draw, 15); // update every 15 milliseconds
     });
 
 
 
 }
+
+
+function draw(){
+
+    // Update uniforms
+    gl.uniform1f(shaderProgram.thread, config.thread);
+    gl.uniform1f(shaderProgram.gap, config.gap);
+    gl.uniform1f(shaderProgram.nw, config.nw);
+    gl.uniform1f(shaderProgram.nh, config.nh);
+    gl.uniform1f(shaderProgram.shade, config.shade);
+
+    // draw
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, rectVertexPositionBuffer.numItems);
+}
+
 
 function initShaders() {
 	// Setup shaders
@@ -48,7 +70,7 @@ function initTexture(callback) {
 	    callback();
 	}
 
-	image.src = "img/pacman64.jpg";
+	image.src = "img/vi.jpg";
 }
 
 function initBuffers(image){
@@ -67,7 +89,7 @@ function initBuffers(image){
 	gl.vertexAttribPointer(shaderProgram.texturePositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 
-    //Draw rectangle
+    //Send rectangle to GPU
     rectVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, rectVertexPositionBuffer);
     vertices = [
@@ -83,7 +105,7 @@ function initBuffers(image){
 
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, rectVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-
+    // draw
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, rectVertexPositionBuffer.numItems);
 
 
@@ -142,12 +164,18 @@ function createProgram() {
     }
 
     // Init uniforms
-    // ...
     program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
     gl.enableVertexAttribArray(program.vertexPositionAttribute);
 
     program.texturePositionAttribute = gl.getAttribLocation(program, "aTexCoord");
     gl.enableVertexAttribArray(program.texturePositionAttribute);
+
+    program.thread = gl.getUniformLocation(program, 'thread');
+    program.gap = gl.getUniformLocation(program, 'gap');
+    program.nw = gl.getUniformLocation(program, 'nw');
+    program.nh = gl.getUniformLocation(program, 'nh');
+    program.shade = gl.getUniformLocation(program, 'shade');
+
 
     return program;
 }

@@ -4,19 +4,31 @@ uniform sampler2D uImage;
 
 varying vec2 vTexCoord;
 
+uniform float thread; // Trådens bredd i förhållande till stygnet
+uniform float gap; // Marginal för en liten lucka mellan stygnen
+uniform float nh; // Antal pixels (stygn) på höjden i texturen
+uniform float nw; // Antal pixels (stygn) på bredden i texturen
 
+uniform bool shade;
 /*
-	Steg 1:
+	Backlog:
+	-------
+
 	X Kvantisera bilden.
 	X Implement cross stitching
-	Anti aliasing
-	parameters 
+	~ Anti aliasing
+	Skicka upp parametrar till shadern
+		parameters: 
 		* Quantization only
 		* Cross stitching off
-		* width
-		* height 
-	Gör en loop för att rendera om bilden
-	Skicka upp parametrar till shadern
+		* Background color
+		X * width
+		X * height 
+		X * thread width
+		X * stich spacing
+	X Gör en loop för att rendera om bilden
+	Add noise effects
+	
 
  */
 
@@ -59,10 +71,10 @@ float ptlined(vec2 v, vec2 w, vec2 p) {
 
 
 void main() {
-	float thread = 0.2; // Trådens bredd i förhållande till stygnet
-	float gap = 0.02; // Marginal för en liten lucka mellan stygnen
-	float nh = 64.0; // Antal pixels (stygn) på höjden i texturen
-	float nw = 64.0; // Antal pixels (stygn) på bredden i texturen
+	//float thread = 0.8; // Trådens bredd i förhållande till stygnet
+	//float gap = 0.02; // Marginal för en liten lucka mellan stygnen
+	//float nh = 64.0; // Antal pixels (stygn) på höjden i texturen
+	//float nw = 64.0; // Antal pixels (stygn) på bredden i texturen
 	// string texturename = "pacman64.tx";  // Texturbild
 	vec4 Cbg = vec4(0.1, 0.1, 0.3, 1.0); // Bakgrundsfärg
 
@@ -73,6 +85,7 @@ void main() {
 	float s_final = s_scaled;
   	float t_final = t_scaled;
 
+  	// Quantization
 	vec4 C = texture2D( uImage, vec2((floor(s_final)+0.5)/nw, (floor(t_final)+0.5)/nh) );
 
 	vec2 pos = vec2(mod(s_final, 1.0), mod(t_final, 1.0));
@@ -92,13 +105,15 @@ void main() {
 	
 	float d = dmin;
 
-
-	// Anti-aliasing, how?
-	float inside = d;
-	inside = filterstep(thread/2.0, d, 1.0/64.0);
+	float inside = filterstep(thread/2.0, d, 1.0/64.0);
 	
 	
+	if(shade) {
+		gl_FragColor = mix(C, Cbg, inside);
+		
+	} else {
+		gl_FragColor = C;
 
-	gl_FragColor = mix(C, Cbg, inside);
+	}
 
 }
