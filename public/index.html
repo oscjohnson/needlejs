@@ -1,12 +1,21 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="css/style.css">
-
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+		<script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+		<script src="js/lib/jquery-ui.min.js"></script>
 		<script src="js/helpers.js"></script>
 		<script src="js/main.js"></script>
+		<script src="js/ui.js"></script>
 	</head>
 	<body onload="start();">
 		<canvas id="canvas" width="800" height="800"></canvas>
-
+		<div id="controls">
+			<input class="shading" checked type="checkbox" name="shading" value="Bike"> Shading<br>
+			<h4>Thread</h4>
+			<div class="thread-slider"></div>
+			<h4>Gap</h4>
+			<div class="gap-slider"></div>
+		</div>
 	</body>
 </html>

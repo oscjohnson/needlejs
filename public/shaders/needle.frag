@@ -6,10 +6,11 @@ varying vec2 vTexCoord;
 
 uniform float thread; // Trådens bredd i förhållande till stygnet
 uniform float gap; // Marginal för en liten lucka mellan stygnen
-uniform float nh; // Antal pixels (stygn) på höjden i texturen
-uniform float nw; // Antal pixels (stygn) på bredden i texturen
+uniform float nh; // Number of pixels (stiches) height in texture
+uniform float nw; // Number of pixels (stiches) width in texture
+uniform vec3 bg; // Background color
 
-uniform bool shade;
+uniform bool shading; // 
 /*
 	Backlog:
 	-------
@@ -17,11 +18,11 @@ uniform bool shade;
 	X Kvantisera bilden.
 	X Implement cross stitching
 	~ Anti aliasing
-	Skicka upp parametrar till shadern
+	X Skicka upp parametrar till shadern
 		parameters: 
-		* Quantization only
-		* Cross stitching off
-		* Background color
+		( Quantization only )
+		X Cross stitching off
+		X Background color
 		X * width
 		X * height 
 		X * thread width
@@ -76,7 +77,8 @@ void main() {
 	//float nh = 64.0; // Antal pixels (stygn) på höjden i texturen
 	//float nw = 64.0; // Antal pixels (stygn) på bredden i texturen
 	// string texturename = "pacman64.tx";  // Texturbild
-	vec4 Cbg = vec4(0.1, 0.1, 0.3, 1.0); // Bakgrundsfärg
+	//vec4 Cbg = vec4(0.1, 0.1, 0.3, 1.0); // Bakgrundsfärg
+	vec4 Cbg = vec4(bg, 1.0);
 
 	// Skalade koordinater för stygnen
 	float s_scaled = vTexCoord.x*nw;
@@ -107,12 +109,13 @@ void main() {
 
 	float inside = filterstep(thread/2.0, d, 1.0/64.0);
 	
+
 	
-	if(shade) {
+	if(shading) {
 		gl_FragColor = mix(C, Cbg, inside);
 		
 	} else {
-		gl_FragColor = C;
+		gl_FragColor = texture2D(uImage, vTexCoord);
 
 	}
 

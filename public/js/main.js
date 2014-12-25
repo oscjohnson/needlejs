@@ -9,7 +9,8 @@ config.thread = 0.3,
 config.gap = 0.02;
 config.nw = 64.0;
 config.nh = 64.0
-config.shade = true;
+config.shading = true;
+config.bg = [0.1, 0.1, 0.3];
 
 function start() {
 	var canvas = document.getElementById("canvas");
@@ -23,8 +24,6 @@ function start() {
         setInterval(draw, 15); // update every 15 milliseconds
     });
 
-
-
 }
 
 
@@ -35,7 +34,8 @@ function draw(){
     gl.uniform1f(shaderProgram.gap, config.gap);
     gl.uniform1f(shaderProgram.nw, config.nw);
     gl.uniform1f(shaderProgram.nh, config.nh);
-    gl.uniform1f(shaderProgram.shade, config.shade);
+    gl.uniform1f(shaderProgram.shading, config.shading);
+    gl.uniform3f(shaderProgram.bg, config.bg[0], config.bg[1], config.bg[2]);
 
     // draw
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, rectVertexPositionBuffer.numItems);
@@ -174,7 +174,8 @@ function createProgram() {
     program.gap = gl.getUniformLocation(program, 'gap');
     program.nw = gl.getUniformLocation(program, 'nw');
     program.nh = gl.getUniformLocation(program, 'nh');
-    program.shade = gl.getUniformLocation(program, 'shade');
+    program.shading = gl.getUniformLocation(program, 'shading');
+    program.bg = gl.getUniformLocation(program, 'bg');
 
 
     return program;

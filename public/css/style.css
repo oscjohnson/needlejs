@@ -8,3 +8,12 @@
 body {
 	font-family: sans-serif;
 }
+
+#canvas, #controls {
+	float: left;
+}
+
+#controls {
+	width: 300px;
+	padding: 10px;
+}

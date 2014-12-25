@@ -1,0 +1,1 @@
+http://renderman.pixar.com/resources/current/rps/basicAntialiasing.html
