@@ -4,16 +4,19 @@ var image,
 rectVertexPositionBuffer,
 texCoordPositionBuffer,
 texture,
+parameters,
 config = {};
 config.thread = 0.3,
 config.gap = 0.02;
 config.nw = 64.0;
 config.nh = 64.0
 config.shading = true;
-config.bg = [0.1, 0.1, 0.3];
+config.bg = [0, 0, 0]; //[0.1, 0.1, 0.3];
 
 function start() {
 	var canvas = document.getElementById("canvas");
+
+    parameters = getURLParameters();
 
 	initWebGL(canvas);      // Initialize the GL context
 
@@ -70,7 +73,12 @@ function initTexture(callback) {
 	    callback();
 	}
 
-	image.src = "img/vi.jpg";
+    if(parameters.image !== undefined) {
+	   image.src = parameters.image; 
+
+    } else {
+       image.src = "img/vi.jpg"; 
+    }
 }
 
 function initBuffers(image){
@@ -94,10 +102,10 @@ function initBuffers(image){
     gl.bindBuffer(gl.ARRAY_BUFFER, rectVertexPositionBuffer);
     vertices = [
         // Front face
-        1.0, 1.0,
         -1.0, 1.0,
-        1.0, -1.0,
-        -1.0, -1.0
+        1.0, 1.0,
+        -1.0, -1.0,
+        1.0, -1.0
     ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
     rectVertexPositionBuffer.itemSize = 2;

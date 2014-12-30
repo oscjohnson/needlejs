@@ -12,6 +12,7 @@
     "gulp-ruby-sass": "~0.7.1",
     "gulp": "~3.8.10",
     "express": "~4.10.6",
-    "gulp-livereload": "~3.0.2"
+    "gulp-livereload": "~3.0.2",
+    "multer": "~0.1.6"
   }
 }

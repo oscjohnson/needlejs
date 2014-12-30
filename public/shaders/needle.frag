@@ -10,7 +10,7 @@ uniform float nh; // Number of pixels (stiches) height in texture
 uniform float nw; // Number of pixels (stiches) width in texture
 uniform vec3 bg; // Background color
 
-uniform bool shading; // 
+uniform bool shading; // Show cross stitching shading or or just original image
 /*
 	Backlog:
 	-------
@@ -72,12 +72,7 @@ float ptlined(vec2 v, vec2 w, vec2 p) {
 
 
 void main() {
-	//float thread = 0.8; // Trådens bredd i förhållande till stygnet
-	//float gap = 0.02; // Marginal för en liten lucka mellan stygnen
-	//float nh = 64.0; // Antal pixels (stygn) på höjden i texturen
-	//float nw = 64.0; // Antal pixels (stygn) på bredden i texturen
-	// string texturename = "pacman64.tx";  // Texturbild
-	//vec4 Cbg = vec4(0.1, 0.1, 0.3, 1.0); // Bakgrundsfärg
+
 	vec4 Cbg = vec4(bg, 1.0);
 
 	// Skalade koordinater för stygnen
@@ -113,10 +108,8 @@ void main() {
 	
 	if(shading) {
 		gl_FragColor = mix(C, Cbg, inside);
-		
 	} else {
 		gl_FragColor = texture2D(uImage, vTexCoord);
-
 	}
 
 }

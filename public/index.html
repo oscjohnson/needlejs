@@ -9,13 +9,20 @@
 		<script src="js/ui.js"></script>
 	</head>
 	<body onload="start();">
-		<canvas id="canvas" width="800" height="800"></canvas>
+		<canvas id="canvas" width="650" height="650"></canvas>
+		<form method="post" enctype="multipart/form-data" action="/upload">
+			<input type="file" required name="file">
+			<input type="submit" value="Submit">
+		</form>
 		<div id="controls">
 			<input class="shading" checked type="checkbox" name="shading" value="Bike"> Shading<br>
 			<h4>Thread</h4>
-			<div class="thread-slider"></div>
+			<div class="space thread-slider"></div>
 			<h4>Gap</h4>
-			<div class="gap-slider"></div>
+			<div class="space gap-slider"></div>
+			<h4>Background</h4>
+			<input class="space color" value="#000000" type="color">
+			<button class="color-btn">Send color</button>
 		</div>
 	</body>
 </html>
