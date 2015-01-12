@@ -19,6 +19,14 @@ jQuery(document).ready(function($) {
 		}
 	});
 
+	$('#controls .noise-slider').slider({
+		min: 0,
+		max: 100,
+		value: 2,
+		slide: function( event, ui ) {
+			config.noise = ui.value / 100;
+		}
+	});
 	
 	$('#controls .shading:input[type=checkbox]').change( function(){
         if (this.checked) {
@@ -32,7 +40,6 @@ jQuery(document).ready(function($) {
     
 	$('#controls .color-btn').on('click', function(){
 		var hex = $('#controls .color').val();
-		console.log(hex);
 		config.bg = hex2rgb(hex);
 	});
 

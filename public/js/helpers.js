@@ -31,7 +31,7 @@ function getURLParameters() {
         else
             b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
     }
-    console.log(b);
+    
     return b;
 }
 

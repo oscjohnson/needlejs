@@ -40,7 +40,7 @@ gulp.task('default', function(){
 	       	    if (err) throw err;
         		res.redirect('/?image=' + string);
 	        });
-	            console.log("Upload completed!");
+
 	
 	});
 

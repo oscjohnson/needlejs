@@ -6,12 +6,13 @@ texCoordPositionBuffer,
 texture,
 parameters,
 config = {};
-config.thread = 0.3,
-config.gap = 0.02;
+config.thread = 0.2,
+config.gap = 0.09;
 config.nw = 64.0;
 config.nh = 64.0
 config.shading = true;
-config.bg = [0, 0, 0]; //[0.1, 0.1, 0.3];
+config.noise = 0.1;
+config.bg = [0.1, 0.1, 0.3];
 
 function start() {
 	var canvas = document.getElementById("canvas");
@@ -33,6 +34,7 @@ function start() {
 function draw(){
 
     // Update uniforms
+    gl.uniform1f(shaderProgram.noise, config.noise);
     gl.uniform1f(shaderProgram.thread, config.thread);
     gl.uniform1f(shaderProgram.gap, config.gap);
     gl.uniform1f(shaderProgram.nw, config.nw);
@@ -77,7 +79,7 @@ function initTexture(callback) {
 	   image.src = parameters.image; 
 
     } else {
-       image.src = "img/vi.jpg"; 
+       image.src = "img/pacman64.jpg"; 
     }
 }
 
@@ -179,6 +181,7 @@ function createProgram() {
     gl.enableVertexAttribArray(program.texturePositionAttribute);
 
     program.thread = gl.getUniformLocation(program, 'thread');
+    program.noise = gl.getUniformLocation(program, 'gridnoiseAmplitue');
     program.gap = gl.getUniformLocation(program, 'gap');
     program.nw = gl.getUniformLocation(program, 'nw');
     program.nh = gl.getUniformLocation(program, 'nh');
