@@ -1,27 +1,22 @@
 precision mediump float;
 
-uniform sampler2D uImage;
 
 varying vec2 vTexCoord;
 
-uniform float thread; // Trådens bredd i förhållande till stygnet
-uniform float gap; // Marginal för en liten lucka mellan stygnen
-uniform float nh; // Number of pixels (stiches) height in texture
-uniform float nw; // Number of pixels (stiches) width in texture
+uniform vec2 iResolution; // Canvas resolution
+uniform sampler2D uImage; // Original image
+uniform float thread; // The width of the thread
+uniform float gap; // Gap between stitches
+uniform float nh; // Number of stitches vertically
+uniform float nw; // Number of stitches horizontally
 uniform vec3 bg; // Background color
-uniform float gridnoiseAmplitue; // Background color
+uniform float gridnoiseAmplitue; // A noise parameter for the 'waviness' of the grid
+uniform bool shading; // Show cross stitching image or original image
 
-uniform bool shading; // Show cross stitching shading or or just original image
-
-//
-// Description : Array and textureless GLSL 2D simplex noise function.
-//      Author : Ian McEwan, Ashima Arts.
-//  Maintainer : ijm
-//     Lastmod : 20110822 (ijm)
-//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
-//               Distributed under the MIT License. See LICENSE file.
-//               https://github.com/ashima/webgl-noise
-// 
+/*
+	Classical perlin noise implementation by Stefan Gustavson
+	with help functions: mod289 and permute
+*/
 
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -83,6 +78,9 @@ float snoise(vec2 v) {
 	return 130.0 * dot(m, g);
 }
 
+/*
+	A filterstep implementation according to RSL.
+	Source: http://renderman.pixar.com/resources/current/rps/basicAntialiasing.html	
 float filterstep(float edge, float x, float w) {
 	if( (x+w/2.0) < edge) {
 		return 0.0;
@@ -90,26 +88,31 @@ float filterstep(float edge, float x, float w) {
 	else if( (x - w/2.0) > edge) {
 		return 1.0;
 	}
-	
+	return ( (x+w/2.0) - edge ) / w;
+}
+*/
+float filterstep(float edge, float x, float w) {
+	if( (x+w/2.0) < edge) {
+		return 0.0;
+	}
+	else if( (x - w/2.0) > edge) {
+		return 1.0;
+	}
 	return ( (x+w/2.0) - edge ) / w;
 }
 
-float length_squared(vec2 v, vec2 w) {
-	return float ((v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y));
-
-}
-
+/*
+	Find the distance between point p and the line formed by v and w.
+*/
 float ptlined(vec2 v, vec2 w, vec2 p) {
 
-  	// Return minimum distance between line segment vw and point p
-	float l2 = length_squared(v, w);  // i.e. |w-v|^2 -  avoid a sqrt
+  	float length_squared = ((v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y));
+	float l2 = length_squared;  // i.e. |w-v|^2 -  avoid a sqrt
 	if (l2 == 0.0) {
 		return distance(p, v);   // v == w case
 	}
-	// Consider the line extending the segment, parameterized as v + t (w - v).
-	// We find projection of point p onto the line. 
-	// It falls where t = [(p-v) . (w-v)] / |w-v|^2
-   	float t = dot(p - v, w - v) / l2;
+
+   	float t = dot(p - v, w - v) / l2; 
   	
   	if (t < 0.0) {
 		return distance(p, v);       // Beyond the 'v' end of the segment
@@ -123,49 +126,48 @@ float ptlined(vec2 v, vec2 w, vec2 p) {
 
 void main() {
 
+	// Background color
 	vec4 Cbg = vec4(bg, 1.0);
 
-	// Skalade koordinater för stygnen
+	// Scale texture coordinates to stitch coordinates
+	// i.e.: 0.0 -> 1.0 = 0.0 -> nw/nh
 	float s_scaled = vTexCoord.x*nw;
 	float t_scaled = vTexCoord.y*nh;
 
-	//float gridnoiseAmplitue = 0.2;
+	// Create noise in the pixelgrid
 	float s_noise = snoise(vec2(s_scaled * 0.2, t_scaled * 0.2)) * gridnoiseAmplitue;
   	float t_noise = snoise(vec2(s_scaled * 0.2 + 43.76, t_scaled * 0.2 + 3.1415)) * gridnoiseAmplitue;
 	
+	// Add noise to coordinates
 	float s_final = s_scaled + s_noise;
   	float t_final = t_scaled + t_noise;
 
-  	// Quantization
+  	// Pixelate, color for the stitch
 	vec4 C = texture2D( uImage, vec2((floor(s_final)+0.5)/nw, (floor(t_final)+0.5)/nh) );
 
+	// Current point in stitch
 	vec2 pos = vec2(mod(s_final, 1.0), mod(t_final, 1.0));
 
-
-	// De fyra hörnpunkterna för stygnet
+	// The 4 corner points for the stitch
 	vec2 p1 = vec2(gap + thread/2.0, gap + thread/2.0);
 	vec2 p2 = vec2(1.0 - gap - thread/2.0, gap + thread/2.0);
 	vec2 p3 = vec2(gap + thread/2.0, 1.0 - gap - thread/2.0);
 	vec2 p4 = vec2(1.0 - gap - thread/2.0, 1.0 - gap - thread/2.0);
 
-	// Avstånd till respektive delstygn (diagonala streck p1-p4, p2-p3)
+	
+	// Distance to the lines p1-p4, p2-p3
 	float d1 = ptlined(p1, p4, pos);
 	float d2 = ptlined(p2, p3, pos);
-	// Avstånd till närmaste stygn ger kryssets ytterkontur
-	float dmin = min(d1, d2);
-	
-	// Skapa en slumpmässig ojämnhet i kanten
-	// float d_noise = 0.01 * snoise(vec2(10.0 * s_scaled, 10.0 * t_scaled));
-	float d = dmin;// + d_noise;
 
-	float inside = filterstep(thread/2.0, d, 1.0/64.0);
+	// Distance to closest stitch, gives the intensity of the color of the fragment.
+	float d = min(d1, d2);
+
+	// Anti-aliasing
+	float inside = filterstep(thread/2.0, d, nh/iResolution.x);
 	
 
-	
-	if(shading) { // Render cross-stich shading
+	if(shading) { // Render cross-stitch shading
 		gl_FragColor = mix(C, Cbg, inside);
-		// float myNoise = snoise(vec2(s_scaled, t_scaled));
-		// gl_FragColor = vec4(myNoise, myNoise, myNoise, 1);
 	} else { // Render original image
 		gl_FragColor = texture2D(uImage, vTexCoord);
 	}

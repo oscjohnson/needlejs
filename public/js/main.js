@@ -6,16 +6,21 @@ texCoordPositionBuffer,
 texture,
 parameters,
 config = {};
-config.thread = 0.2,
-config.gap = 0.09;
+
+// Default values for controls
+config.thread = 0.1;
+config.gap = 0.2;
 config.nw = 64.0;
-config.nh = 64.0
+config.nh = 64.0;
 config.shading = true;
-config.noise = 0.1;
+config.noise = 0.0;
 config.bg = [0.1, 0.1, 0.3];
+
 
 function start() {
 	var canvas = document.getElementById("canvas");
+    
+    config.resolution = {w: canvas.width, h: canvas.height};
 
     parameters = getURLParameters();
 
@@ -34,6 +39,7 @@ function start() {
 function draw(){
 
     // Update uniforms
+    gl.uniform2f(shaderProgram.resolution, config.resolution.w, config.resolution.h);
     gl.uniform1f(shaderProgram.noise, config.noise);
     gl.uniform1f(shaderProgram.thread, config.thread);
     gl.uniform1f(shaderProgram.gap, config.gap);
@@ -180,6 +186,7 @@ function createProgram() {
     program.texturePositionAttribute = gl.getAttribLocation(program, "aTexCoord");
     gl.enableVertexAttribArray(program.texturePositionAttribute);
 
+    program.resolution = gl.getUniformLocation(program, 'iResolution');
     program.thread = gl.getUniformLocation(program, 'thread');
     program.noise = gl.getUniformLocation(program, 'gridnoiseAmplitue');
     program.gap = gl.getUniformLocation(program, 'gap');
