@@ -1,13 +1,6 @@
 jQuery(document).ready(function($) {
-
 	$('#controls .shading:input[type=checkbox]').change( function(){
-        if (this.checked) {
-        	config.shading = true;
-        }
-        else{
-        	config.shading = false;
-        }
-
+        config.shading = this.checked;
     });
 
 	$('#controls .thread-slider').slider({
@@ -41,7 +34,6 @@ jQuery(document).ready(function($) {
 		var newValue = $(this).val();
 		config.nw = newValue;
 		config.nh = newValue;
-
     });	
 
 
@@ -49,8 +41,4 @@ jQuery(document).ready(function($) {
 		var hex = $('#controls .color').val();
 		config.bg = hex2rgb(hex);
 	});
-
-
-
-
 });
