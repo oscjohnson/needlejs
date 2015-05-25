@@ -4,11 +4,11 @@ var express = require('express'),
 	path = require('path'),
     multer = require('multer'),
     fs = require('fs');
-
+var port = 2001;
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(multer({dest:'./public/uploads/'}));
-app.listen(2000);
+app.listen(port);
 
 // Handle file upload
 app.post('/upload', function (req, res) {
@@ -30,4 +30,4 @@ app.post('/upload', function (req, res) {
 
 });
 
-console.log('http://localhost:2000');
+console.log('http://localhost:'+port);
