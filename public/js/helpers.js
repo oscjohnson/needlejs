@@ -7,7 +7,6 @@ function getSourceSynch(url) {
 
 
 function createTexture(){
-
 	var texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
 

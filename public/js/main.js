@@ -32,12 +32,10 @@ function start() {
     	initBuffers();
         setInterval(draw, 15); // update every 15 milliseconds
     });
-
 }
 
 
 function draw(){
-
     // Update uniforms
     gl.uniform2f(shaderProgram.resolution, config.resolution.w, config.resolution.h);
     gl.uniform1f(shaderProgram.noise, config.noise);
@@ -57,11 +55,9 @@ function initShaders() {
 	// Setup shaders
 	shaderProgram = createProgram();
 	gl.useProgram(shaderProgram);
-
 }
 
 function initTexture(callback) {
-
 	image = new Image();
 
 	image.onload = function () {
@@ -89,8 +85,7 @@ function initTexture(callback) {
     }
 }
 
-function initBuffers(image){
-	
+function initBuffers(image){	
     // Texture buffer
     texCoordPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, texCoordPositionBuffer);
@@ -123,8 +118,6 @@ function initBuffers(image){
 
     // draw
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, rectVertexPositionBuffer.numItems);
-
-
 }
 
 function initWebGL(canvas) {
@@ -165,8 +158,6 @@ function createShader(source, type){
 }
 
 function createProgram() {
-
-
     var fragmentShader = createShader('shaders/needle.frag', gl.FRAGMENT_SHADER);
     var vertexShader = createShader('shaders/pass-through.vert', gl.VERTEX_SHADER);
 
@@ -194,7 +185,6 @@ function createProgram() {
     program.nh = gl.getUniformLocation(program, 'nh');
     program.shading = gl.getUniformLocation(program, 'shading');
     program.bg = gl.getUniformLocation(program, 'bg');
-
 
     return program;
 }
